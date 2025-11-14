@@ -5,10 +5,36 @@ interface BootScreenProps {
   onBootComplete: () => void;
 }
 
+interface BootScreenSettings {
+  boot_screen_line1: string;
+  boot_screen_line2: string;
+  boot_screen_copyright: string;
+}
+
 const BootScreen: React.FC<BootScreenProps> = ({ onBootComplete }) => {
   const [loadingProgress, setLoadingProgress] = useState(0);
+  const [bootSettings, setBootSettings] = useState<BootScreenSettings>({
+    boot_screen_line1: "Sujay's",
+    boot_screen_line2: "Portfolio",
+    boot_screen_copyright: "Copyright © Sujay K"
+  });
 
   useEffect(() => {
+    fetch('/api/site-settings')
+      .then(response => response.json())
+      .then(data => {
+        if (data.boot_screen_line1 || data.boot_screen_line2 || data.boot_screen_copyright) {
+          setBootSettings({
+            boot_screen_line1: data.boot_screen_line1 || "Sujay's",
+            boot_screen_line2: data.boot_screen_line2 || "Portfolio",
+            boot_screen_copyright: data.boot_screen_copyright || "Copyright © Sujay K"
+          });
+        }
+      })
+      .catch(error => {
+        console.error('Failed to fetch boot screen settings:', error);
+      });
+
     const interval = setInterval(() => {
       setLoadingProgress((prev) => {
         if (prev >= 100) {
@@ -37,8 +63,8 @@ const BootScreen: React.FC<BootScreenProps> = ({ onBootComplete }) => {
         </div>
         <div className={styles.brandingContainer}>
           <div className={styles.branding}>
-            <span className={styles.sujay}>Sujay&apos;s</span>
-            <span className={styles.portfolio}>Portfolio</span>
+            <span className={styles.sujay}>{bootSettings.boot_screen_line1}</span>
+            <span className={styles.portfolio}>{bootSettings.boot_screen_line2}</span>
           </div>
         </div>
         <div className={styles.loadingBarContainer}>
@@ -50,7 +76,7 @@ const BootScreen: React.FC<BootScreenProps> = ({ onBootComplete }) => {
           </div>
         </div>
         <div className={styles.copyright}>
-          Copyright © Sujay K
+          {bootSettings.boot_screen_copyright}
         </div>
       </div>
     </div>

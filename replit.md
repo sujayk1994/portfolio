@@ -20,8 +20,9 @@ This script will:
 1. Install Python dependencies (uv sync)
 2. Install NPM packages (npm install)
 3. Build the Next.js frontend (npm run build)
-4. Initialize the database with all tables
-5. Start the Flask backend on port 5000
+4. Initialize the database with all tables (first-time only)
+5. Run database migrations (apply schema updates)
+6. Start the Flask backend on port 5000
 
 ### Option 2: Docker Deployment
 
@@ -100,7 +101,7 @@ Preferred communication style: Simple, everyday language.
 - **Project**: Portfolio projects with metadata, images, and ordering
 - **ResumeInfo**: Resume/CV data storage
 - **WebLink**: Social and professional links
-- **SiteSettings**: Complete site personalization including PC name, owner name/email, social links (GitHub, LinkedIn), browser titles, about me content, and up to 4 profile images
+- **SiteSettings**: Complete site personalization including PC name, owner name/email, social links (GitHub, LinkedIn), browser titles, about me content, up to 4 profile images, and boot screen customization (added November 14, 2025)
 
 ### External Dependencies
 
@@ -141,8 +142,18 @@ Preferred communication style: Simple, everyday language.
   - Social media links (GitHub, LinkedIn)
   - About Me content with multiple text sections
   - Profile image management (up to 4 images with preview)
+  - Boot screen customization (line 1, line 2, and copyright text) - added November 14, 2025
   - Images uploaded to `backend/app/static/uploads` and served via `/admin/uploads/<filename>`
   - All settings accessible via `/api/site-settings` for frontend integration
+
+**Database Migrations:**
+- Flask-Migrate (Alembic) used for schema management
+- Migrations stored in `backend/migrations/versions/`
+- Database initialization script (`backend/init_db.py`) is migration-aware:
+  - On first run (empty database): creates all tables via db.create_all()
+  - On subsequent runs: skips table creation to prevent schema drift
+  - Always runs migration upgrade via `flask db upgrade` in start.sh
+- Latest migration (November 14, 2025): Added boot screen customization fields to SiteSettings
 
 **Deployment Considerations:**
 - Static frontend served from Flask eliminates need for separate Next.js server

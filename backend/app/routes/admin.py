@@ -190,6 +190,9 @@ def update_settings():
     settings.about_interests = data.get('about_interests', settings.about_interests)
     settings.about_interests2 = data.get('about_interests2', settings.about_interests2)
     settings.about_interests3 = data.get('about_interests3', settings.about_interests3)
+    settings.boot_screen_line1 = data.get('boot_screen_line1', settings.boot_screen_line1)
+    settings.boot_screen_line2 = data.get('boot_screen_line2', settings.boot_screen_line2)
+    settings.boot_screen_copyright = data.get('boot_screen_copyright', settings.boot_screen_copyright)
     
     db.session.commit()
     

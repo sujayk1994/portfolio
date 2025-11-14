@@ -119,6 +119,9 @@ class SiteSettings(db.Model):
     profile_image_2 = db.Column(db.String(500))
     profile_image_3 = db.Column(db.String(500))
     profile_image_4 = db.Column(db.String(500))
+    boot_screen_line1 = db.Column(db.String(100), default="Sujay's")
+    boot_screen_line2 = db.Column(db.String(100), default="Portfolio")
+    boot_screen_copyright = db.Column(db.String(200), default="Copyright © Sujay K")
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     def to_dict(self):
@@ -140,6 +143,9 @@ class SiteSettings(db.Model):
             'profile_image_2': self.profile_image_2,
             'profile_image_3': self.profile_image_3,
             'profile_image_4': self.profile_image_4,
+            'boot_screen_line1': self.boot_screen_line1,
+            'boot_screen_line2': self.boot_screen_line2,
+            'boot_screen_copyright': self.boot_screen_copyright,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }
 

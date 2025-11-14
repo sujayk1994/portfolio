@@ -61,7 +61,10 @@ def get_site_settings():
         'profile_image_1': None,
         'profile_image_2': None,
         'profile_image_3': None,
-        'profile_image_4': None
+        'profile_image_4': None,
+        'boot_screen_line1': "Sujay's",
+        'boot_screen_line2': "Portfolio",
+        'boot_screen_copyright': "Copyright © Sujay K"
     })
 
 @bp.route('/folders', methods=['GET'])
