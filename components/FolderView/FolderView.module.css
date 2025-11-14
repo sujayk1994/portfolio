@@ -1,0 +1,127 @@
+.container {
+  width: 100%;
+  height: 100%;
+  background: white;
+  padding: 10px;
+  overflow-y: auto;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-bottom: 1px solid #d4d0c8;
+  margin-bottom: 10px;
+}
+
+.backButton {
+  padding: 4px 12px;
+  background: linear-gradient(180deg, #fff 0%, #ece9d8 100%);
+  border: 1px solid #003c74;
+  border-radius: 3px;
+  cursor: pointer;
+  font-family: "Tahoma", sans-serif;
+  font-size: 11px;
+}
+
+.backButton:hover {
+  background: linear-gradient(180deg, #fff 0%, #d8d4c8 100%);
+}
+
+.backButton:active {
+  background: linear-gradient(180deg, #d8d4c8 0%, #ece9d8 100%);
+}
+
+.folderTitle {
+  font-family: "Tahoma", sans-serif;
+  font-size: 13px;
+  font-weight: bold;
+  color: #000;
+  margin: 0;
+}
+
+.folderGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 15px;
+  padding: 10px;
+}
+
+.folderItem,
+.fileItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 2px;
+  transition: background-color 0.1s;
+}
+
+.folderItem:hover,
+.fileItem:hover {
+  background-color: #e8f4ff;
+  border: 1px dotted #0078d7;
+}
+
+.folderItem:active,
+.fileItem:active {
+  background-color: #cce8ff;
+}
+
+.iconWrapper,
+.thumbnailWrapper {
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.folderIconImg {
+  width: 48px;
+  height: 48px;
+  image-rendering: pixelated;
+}
+
+.thumbnail {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border: 1px solid #999;
+}
+
+.noThumbnail {
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0f0f0;
+  border: 1px solid #999;
+}
+
+.label,
+.fileLabel {
+  text-align: center;
+  font-family: "Tahoma", sans-serif;
+  font-size: 11px;
+  color: #000;
+  word-wrap: break-word;
+  max-width: 90px;
+}
+
+.itemCount {
+  display: block;
+  font-size: 10px;
+  color: #666;
+  margin-top: 2px;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+  font-family: "Tahoma", sans-serif;
+  font-size: 12px;
+}

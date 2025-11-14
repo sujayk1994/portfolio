@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Portfolio CMS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+        }
+        .header {
+            background: white;
+            padding: 20px 40px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            color: #333;
+            font-size: 24px;
+        }
+        .logout-btn {
+            padding: 10px 20px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        .section {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+        .btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        .projects-list, .links-list {
+            margin-top: 20px;
+        }
+        .item {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .item h3 {
+            font-size: 16px;
+            color: #333;
+        }
+        .item-actions button {
+            padding: 5px 15px;
+            margin-left: 5px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .edit-btn {
+            background: #3498db;
+            color: white;
+        }
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 500;
+        }
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .form-group textarea {
+            min-height: 100px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .close-modal {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #999;
+        }
+        .close-modal:hover {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Portfolio Admin Dashboard</h1>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+
+    <div class="container">
+        <div class="section">
+            <h2>Site Personalization</h2>
+            <p style="color: #666; margin-bottom: 15px;">Manage your website's name, email, social links, profile photos, and about me content</p>
+            <a href="/admin/settings-dashboard" class="btn" style="text-decoration: none; display: inline-block;">Manage Site Settings</a>
+        </div>
+
+        <div class="section">
+            <h2>Projects</h2>
+            <button class="btn" onclick="showAddProjectModal()">Add New Project</button>
+            <div class="projects-list" id="projectsList"></div>
+        </div>
+
+        <div class="section">
+            <h2>Resume Information</h2>
+            <button class="btn" onclick="editResume()">Edit Resume Info</button>
+        </div>
+
+        <div class="section">
+            <h2>Website Links</h2>
+            <button class="btn" onclick="showAddLinkModal()">Add New Link</button>
+            <div class="links-list" id="linksList"></div>
+        </div>
+    </div>
+
+    <div id="projectModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('projectModal')">&times;</span>
+            <h2>Add/Edit Project</h2>
+            <form id="projectForm">
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" id="projectTitle" required>
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea id="projectDesc"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Technologies</label>
+                    <input type="text" id="projectTech" placeholder="React, Node.js, etc.">
+                </div>
+                <div class="form-group">
+                    <label>GitHub URL</label>
+                    <input type="url" id="projectGithub">
+                </div>
+                <div class="form-group">
+                    <label>Live URL</label>
+                    <input type="url" id="projectLive">
+                </div>
+                <div class="form-group">
+                    <label>Image URL</label>
+                    <input type="url" id="projectImage">
+                </div>
+                <button type="submit" class="btn">Save Project</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        async function loadProjects() {
+            const response = await fetch('/api/projects');
+            const projects = await response.json();
+            const list = document.getElementById('projectsList');
+            list.innerHTML = projects.map(p => `
+                <div class="item">
+                    <div>
+                        <h3>${p.title}</h3>
+                        <p>${p.description || ''}</p>
+                    </div>
+                    <div class="item-actions">
+                        <button class="edit-btn" onclick="editProject(${p.id})">Edit</button>
+                        <button class="delete-btn" onclick="deleteProject(${p.id})">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showAddProjectModal() {
+            document.getElementById('projectForm').reset();
+            document.getElementById('projectModal').classList.add('show');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        async function logout() {
+            await fetch('/admin/logout', { method: 'POST' });
+            window.location.href = '/admin/login';
+        }
+
+        loadProjects();
+    </script>
+</body>
+</html>
