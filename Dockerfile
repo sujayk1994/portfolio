@@ -74,6 +74,7 @@ COPY --from=frontend-builder /app/frontend/out ./out
 # Copy backend application and configuration
 COPY backend ./backend
 COPY gunicorn_config.py ./
+COPY wsgi.py ./
 COPY start.sh ./
 
 # Create upload directory
@@ -98,4 +99,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
     CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:5000/api/projects').read()" || exit 1
 
 # Run with Gunicorn for production
-CMD ["gunicorn", "--config", "gunicorn_config.py", "backend.app:app"]
+CMD ["gunicorn", "--config", "gunicorn_config.py", "wsgi:app"]
