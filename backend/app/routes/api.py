@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from app import db
 from app.models import Project, ResumeInfo, WebLink, SiteSettings, Folder, DesignWork
 from flask_login import login_required
+from datetime import datetime
 
 bp = Blueprint('api', __name__, url_prefix='/api')
 
@@ -123,6 +124,11 @@ def upload_to_folder(folder_id):
     import os
     from PIL import Image
     
+    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+    
+    def allowed_file(filename):
+        return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    
     folder = Folder.query.get_or_404(folder_id)
     
     if 'files' not in request.files:
@@ -136,6 +142,9 @@ def upload_to_folder(folder_id):
     
     for file in files:
         if file and file.filename:
+            if not allowed_file(file.filename):
+                continue
+            
             filename = secure_filename(file.filename)
             timestamp = int(datetime.now().timestamp())
             unique_filename = f"{timestamp}_{filename}"
