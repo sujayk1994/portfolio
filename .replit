@@ -1,5 +1,5 @@
 entrypoint = "main.py"
-modules = ["nodejs-20", "web", "python-3.11"]
+modules = ["nodejs-20", "web", "python-3.11", "postgresql-16"]
 
 [nix]
 channel = "stable-25_05"
@@ -45,3 +45,7 @@ outputType = "webview"
 [[ports]]
 localPort = 5000
 externalPort = 80
+
+[[ports]]
+localPort = 42507
+externalPort = 3000
