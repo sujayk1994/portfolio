@@ -21,6 +21,11 @@ def login_page():
 @bp.route('/dashboard')
 @login_required
 def dashboard():
+    return render_template('admin/visual_dashboard.html')
+
+@bp.route('/dashboard/old')
+@login_required
+def old_dashboard():
     return render_template('admin/dashboard.html')
 
 @bp.route('/login', methods=['POST'])

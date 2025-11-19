@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visual Editor - Portfolio CMS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f0f2f5;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .top-bar h1 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .top-bar-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-save {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-save:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+
+        .btn-logout {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .btn-logout:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Editor Container */
+        .editor-container {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        /* Section Card */
+        .section-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f2f5;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: #667eea;
+        }
+
+        /* Editable Text */
+        .editable {
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            cursor: text;
+            position: relative;
+        }
+
+        .editable:hover {
+            background: #f9fafb;
+            outline: 2px dashed #667eea;
+        }
+
+        .editable:focus {
+            background: white;
+            outline: 2px solid #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .editable[contenteditable="true"] {
+            cursor: text;
+        }
+
+        /* Folders Grid */
+        .folders-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .folder-card {
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .folder-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+
+        .folder-icon {
+            font-size: 40px;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .folder-name {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 5px;
+        }
+
+        .folder-info {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .folder-actions {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            display: flex;
+            gap: 5px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .folder-card:hover .folder-actions {
+            opacity: 1;
+        }
+
+        .icon-btn {
+            background: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .icon-btn:hover {
+            background: #f3f4f6;
+        }
+
+        .icon-btn.delete {
+            color: #ef4444;
+        }
+
+        /* New Folder Button */
+        .new-folder-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: 2px dashed rgba(255,255,255,0.5);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .new-folder-card:hover {
+            border-color: white;
+        }
+
+        .new-folder-card i {
+            font-size: 40px;
+        }
+
+        /* Images Grid */
+        .images-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .image-card {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid #e5e7eb;
+            transition: all 0.3s;
+        }
+
+        .image-card:hover {
+            border-color: #667eea;
+            transform: scale(1.05);
+        }
+
+        .image-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .image-card:hover .image-overlay {
+            opacity: 1;
+        }
+
+        .upload-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: 2px dashed rgba(255,255,255,0.5);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .upload-card:hover {
+            border-color: white;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            padding: 20px 30px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #6b7280;
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+            font-size: 14px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        /* Upload Area */
+        .upload-area {
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .upload-area:hover {
+            border-color: #667eea;
+            background: #f9fafb;
+        }
+
+        .upload-area.dragover {
+            border-color: #667eea;
+            background: #eef2ff;
+        }
+
+        /* File Preview */
+        .file-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .file-preview-item {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .file-preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .remove-file {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        /* Success Message */
+        .success-message {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            display: none;
+            z-index: 1001;
+        }
+
+        .success-message.show {
+            display: block;
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(400px); }
+            to { transform: translateX(0); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <h1><i class="fas fa-paint-brush"></i> Visual Portfolio Editor</h1>
+        <div class="top-bar-actions">
+            <button class="btn btn-save" onclick="saveAllChanges()">
+                <i class="fas fa-save"></i> Save All Changes
+            </button>
+            <button class="btn btn-logout" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </div>
+
+    <!-- Success Message -->
+    <div id="successMessage" class="success-message">
+        <i class="fas fa-check-circle"></i> Changes saved successfully!
+    </div>
+
+    <!-- Editor Container -->
+    <div class="editor-container">
+        <!-- Site Settings Section -->
+        <div class="section-card">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fas fa-cog"></i>
+                    Site Settings
+                </div>
+            </div>
+            <div>
+                <div class="form-group">
+                    <label class="form-label">Website Name (shown on boot screen)</label>
+                    <div class="editable" contenteditable="true" data-field="boot_screen_line1" id="bootScreenLine1">Loading...</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Tagline (shown on boot screen)</label>
+                    <div class="editable" contenteditable="true" data-field="boot_screen_line2" id="bootScreenLine2">Loading...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- My Work Section -->
+        <div class="section-card">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fas fa-folder-open"></i>
+                    <span class="editable" contenteditable="true" data-field="work_section_title">My Work</span>
+                </div>
+                <button class="btn" style="background: #667eea; color: white;" onclick="showNewFolderModal()">
+                    <i class="fas fa-plus"></i> New Folder
+                </button>
+            </div>
+            <div class="folders-grid" id="foldersGrid">
+                <!-- Folders will be loaded here -->
+            </div>
+        </div>
+
+        <!-- My Hobbies Section -->
+        <div class="section-card">
+            <div class="section-header">
+                <div class="section-title">
+                    <i class="fas fa-heart"></i>
+                    <span class="editable" contenteditable="true" data-field="hobbies_section_title">My Hobbies</span>
+                </div>
+                <button class="btn" style="background: #667eea; color: white;" onclick="showUploadHobbyModal()">
+                    <i class="fas fa-upload"></i> Add Images
+                </button>
+            </div>
+            <div class="images-grid" id="hobbiesGrid">
+                <!-- Hobby images will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- New Folder Modal -->
+    <div id="newFolderModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Create New Folder</h3>
+                <button class="close-modal" onclick="closeModal('newFolderModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="newFolderForm" onsubmit="createFolder(event)">
+                    <div class="form-group">
+                        <label class="form-label">Folder Name</label>
+                        <input type="text" class="form-input" id="folderName" required placeholder="e.g., Logo Designs">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Description (optional)</label>
+                        <input type="text" class="form-input" id="folderDesc" placeholder="Brief description">
+                    </div>
+                    <button type="submit" class="btn btn-save" style="width: 100%;">Create Folder</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Folder Content Modal -->
+    <div id="folderContentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="folderContentTitle">Folder Content</h3>
+                <button class="close-modal" onclick="closeModal('folderContentModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+                    <i class="fas fa-cloud-upload-alt" style="font-size: 48px; color: #667eea; margin-bottom: 10px;"></i>
+                    <p style="margin-bottom: 5px; font-weight: 600;">Click to upload or drag and drop</p>
+                    <p style="font-size: 13px; color: #6b7280;">PNG, JPG, GIF up to 10MB</p>
+                    <input type="file" id="fileInput" multiple accept="image/*" style="display: none;" onchange="handleFileSelect(event)">
+                </div>
+                <div class="file-preview" id="filePreview"></div>
+                <div class="images-grid" id="folderImages" style="margin-top: 30px;">
+                    <!-- Existing images will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentFolderId = null;
+        let selectedFiles = [];
+        let siteSettings = {};
+
+        // Load initial data
+        async function loadData() {
+            await loadSiteSettings();
+            await loadFolders();
+            await loadHobbyImages();
+        }
+
+        async function loadSiteSettings() {
+            const response = await fetch('/api/site-settings');
+            siteSettings = await response.json();
+            document.getElementById('bootScreenLine1').textContent = siteSettings.boot_screen_line1 || 'Portfolio';
+            document.getElementById('bootScreenLine2').textContent = siteSettings.boot_screen_line2 || 'Loading...';
+        }
+
+        async function loadFolders() {
+            const response = await fetch('/api/folders');
+            const folders = await response.json();
+            
+            const grid = document.getElementById('foldersGrid');
+            grid.innerHTML = folders.map(folder => `
+                <div class="folder-card" onclick="openFolder(${folder.id}, '${folder.name}')">
+                    <div class="folder-actions">
+                        <button class="icon-btn delete" onclick="event.stopPropagation(); deleteFolder(${folder.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="folder-icon">
+                        <i class="fas fa-folder"></i>
+                    </div>
+                    <div class="folder-name">${folder.name}</div>
+                    <div class="folder-info">${folder.item_count || 0} items</div>
+                </div>
+            `).join('');
+        }
+
+        async function loadHobbyImages() {
+            // Placeholder - will implement hobby image loading
+            const grid = document.getElementById('hobbiesGrid');
+            grid.innerHTML = `
+                <div class="upload-card" onclick="showUploadHobbyModal()">
+                    <i class="fas fa-plus" style="font-size: 40px;"></i>
+                    <div>Add Images</div>
+                </div>
+            `;
+        }
+
+        function showNewFolderModal() {
+            document.getElementById('newFolderModal').classList.add('show');
+        }
+
+        async function createFolder(e) {
+            e.preventDefault();
+            const name = document.getElementById('folderName').value;
+            const description = document.getElementById('folderDesc').value;
+
+            const response = await fetch('/api/folders', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, description })
+            });
+
+            if (response.ok) {
+                closeModal('newFolderModal');
+                await loadFolders();
+                showSuccess();
+                document.getElementById('newFolderForm').reset();
+            }
+        }
+
+        async function deleteFolder(id) {
+            if (!confirm('Delete this folder and all its contents?')) return;
+
+            const response = await fetch(`/api/folders/${id}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                await loadFolders();
+                showSuccess();
+            }
+        }
+
+        async function openFolder(id, name) {
+            currentFolderId = id;
+            document.getElementById('folderContentTitle').textContent = name;
+            document.getElementById('folderContentModal').classList.add('show');
+            await loadFolderContent(id);
+        }
+
+        async function loadFolderContent(folderId) {
+            const response = await fetch(`/api/folders/${folderId}/items`);
+            const items = await response.json();
+            
+            const grid = document.getElementById('folderImages');
+            grid.innerHTML = items.map(item => `
+                <div class="image-card">
+                    <img src="${item.file_url}" alt="${item.title}">
+                    <div class="image-overlay">
+                        <button class="icon-btn delete" onclick="deleteDesignItem(${item.id})">
+                            <i class="fas fa-trash" style="color: white;"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function handleFileSelect(e) {
+            selectedFiles = Array.from(e.target.files);
+            displayFilePreview();
+        }
+
+        function displayFilePreview() {
+            const preview = document.getElementById('filePreview');
+            preview.innerHTML = selectedFiles.map((file, index) => `
+                <div class="file-preview-item">
+                    <img src="${URL.createObjectURL(file)}" alt="Preview">
+                    <button class="remove-file" onclick="removeFile(${index})">&times;</button>
+                </div>
+            `).join('');
+
+            // Auto upload files
+            if (selectedFiles.length > 0 && currentFolderId) {
+                uploadFilesToFolder();
+            }
+        }
+
+        function removeFile(index) {
+            selectedFiles.splice(index, 1);
+            displayFilePreview();
+        }
+
+        async function uploadFilesToFolder() {
+            const formData = new FormData();
+            selectedFiles.forEach(file => formData.append('files', file));
+
+            const response = await fetch(`/api/folders/${currentFolderId}/upload`, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                selectedFiles = [];
+                document.getElementById('filePreview').innerHTML = '';
+                document.getElementById('fileInput').value = '';
+                await loadFolderContent(currentFolderId);
+                showSuccess();
+            }
+        }
+
+        async function deleteDesignItem(id) {
+            if (!confirm('Delete this item?')) return;
+
+            const response = await fetch(`/api/design-work/${id}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                await loadFolderContent(currentFolderId);
+                showSuccess();
+            }
+        }
+
+        function showUploadHobbyModal() {
+            alert('Hobby image upload feature coming soon!');
+        }
+
+        async function saveAllChanges() {
+            // Save inline edits
+            const editables = document.querySelectorAll('.editable[contenteditable="true"]');
+            const updates = {};
+            
+            editables.forEach(el => {
+                const field = el.getAttribute('data-field');
+                if (field) {
+                    updates[field] = el.textContent.trim();
+                }
+            });
+
+            const response = await fetch('/api/site-settings/1', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updates)
+            });
+
+            if (response.ok) {
+                showSuccess();
+            }
+        }
+
+        function showSuccess() {
+            const msg = document.getElementById('successMessage');
+            msg.classList.add('show');
+            setTimeout(() => msg.classList.remove('show'), 3000);
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('show');
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                window.location.href = '/admin/logout';
+            }
+        }
+
+        // Drag and drop
+        const uploadArea = document.getElementById('uploadArea');
+        if (uploadArea) {
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                selectedFiles = Array.from(e.dataTransfer.files);
+                displayFilePreview();
+            });
+        }
+
+        // Load data on page load
+        loadData();
+    </script>
+</body>
+</html>
